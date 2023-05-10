@@ -21,7 +21,7 @@ import {
 } from "firebase/firestore";
 import Link from "next/link";
 import Stripe from "stripe";
-import stripeConfig from "@/services/stripe";
+
 import { loadStripe } from "react-stripe-js";
 import React from "react";
 import { Session } from "inspector";
@@ -285,13 +285,6 @@ export default function Dashboard({ user }: dashboardProps) {
 }
 
 export const getServerSideProps: GetServerSideProps = async ({ req }) => {
-  const stripe = new Stripe(stripeConfig.secretKey, {
-    apiVersion: "2022-11-15",
-  });
-
-  const products = await stripe.products.list();
-  console.log(products.data[0]);
-
   const session = await getSession({ req });
 
   // console.log(session);
@@ -310,7 +303,6 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
     props: {
       user: {
         email: session?.user?.email,
-        products: products.data,
       },
     },
   };

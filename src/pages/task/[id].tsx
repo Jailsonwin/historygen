@@ -101,7 +101,7 @@ export default function Task({ item, allComments }: TaskProps) {
       {session?.user?.email === "jailsonwin@gmail.com" && (
         <section className={styles.commentsContainer}>
           <h2>Completar Historia</h2>
-          <form onSubmit={handleComment}>
+          <form onSubmit={handleComment as any}>
             <Textarea
               placeholder="Digite aqui a historia completa"
               value={input}
