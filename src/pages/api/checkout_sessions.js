@@ -14,9 +14,9 @@ export default async function handler(req, res) {
         ],
         mode: "payment",
         //success_url: `${req.headers.origin}/?success=true`,
-        success_url: `http://localhost:3000/dashboard/?success=true`,
+        success_url: `https://historyplus1.vercel.app/dashboard/?success=true`,
         //cancel_url: `${req.headers.origin}/?canceled=true`,
-        cancel_url: `http://localhost:3000/dashboard/?canceled=true`,
+        cancel_url: `https://historyplus1.vercel.app/dashboard/?canceled=true`,
       });
       res.redirect(303, session.url);
     } catch (err) {
