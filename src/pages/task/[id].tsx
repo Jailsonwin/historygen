@@ -91,7 +91,7 @@ export default function Task({ item, allComments }: TaskProps) {
         <title>Detalhes da Tarefa</title>
       </Head>
       <main className={styles.main}>
-        <h1>Inicio da sua historia</h1>
+        <h1>Inicio da historia</h1>
         <article className={styles.task}>
           <p>{item.tarefa}</p>
         </article>

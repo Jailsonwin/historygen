@@ -22,6 +22,9 @@ import {
 import Link from "next/link";
 import Stripe from "stripe";
 import stripeConfig from "@/services/stripe";
+import { loadStripe } from "react-stripe-js";
+import React from "react";
+import { Session } from "inspector";
 
 interface dashboardProps {
   user: {
@@ -39,12 +42,44 @@ interface TaskProps {
 }
 export default function Dashboard({ user }: dashboardProps) {
   const [input, setInput] = useState("");
-  const [publicTask, setPublicTask] = useState(true);
   const [tasks, setTasks] = useState<TaskProps[]>([]);
+
+  useEffect(() => {
+    const tempTask = localStorage.getItem("tempTask");
+
+    if (tempTask) {
+      setInput(tempTask);
+    }
+  }, []);
+
+  function finalizaCadastro() {
+    const tempTask = localStorage.getItem("tempTask");
+    handleRegisterTask2(tempTask);
+  }
 
   {
     /* CHQCKOUT INICIO */
   }
+
+  const stripePromise = loadStripe(
+    process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY as any
+  );
+
+  React.useEffect(() => {
+    const query = new URLSearchParams(window.location.search);
+    if (query.get("success")) {
+      console.log("Order placed! You will receive an email confirmation.");
+
+      finalizaCadastro();
+    }
+
+    if (query.get("canceled")) {
+      console.log(
+        "Order canceled -- continue to shop around and checkout when you’re ready."
+      );
+      alert("COMPRA CANCELADA");
+    }
+  }, []);
 
   {
     /** CHECKOUT FIM */
@@ -81,10 +116,6 @@ export default function Dashboard({ user }: dashboardProps) {
     loadTarefas();
   }, [user?.email]);
 
-  function handleChangePublic() {
-    setPublicTask(!publicTask);
-  }
-
   async function handleShare(id: string) {
     await navigator.clipboard.writeText(`
     ${process.env.NEXT_PUBLIC_URL}/task/${id}
@@ -97,17 +128,32 @@ export default function Dashboard({ user }: dashboardProps) {
     await deleteDoc(docRef);
   }
 
-  async function handleRegisterTask(event: HTMLFormElement) {
-    event.preventDefault();
+  async function handleRegisterTask2(valor: any) {
+    if (valor === "") return;
+    await addDoc(collection(db, "tarefas"), {
+      tarefa: valor,
+      public: true,
+      created: new Date(),
+      user: user?.email,
+    });
+    setInput("");
+
+    try {
+    } catch (erro) {
+      console.log(erro);
+    }
+  }
+
+  async function handleRegisterTask() {
     if (input === "") return;
     await addDoc(collection(db, "tarefas"), {
       tarefa: input,
       created: new Date(),
       user: user?.email,
-      public: publicTask,
+      public: true,
     });
     setInput("");
-    setPublicTask(false);
+
     try {
     } catch (erro) {
       console.log(erro);
@@ -125,15 +171,22 @@ export default function Dashboard({ user }: dashboardProps) {
           <div className={styles.contentForm}>
             <h1 className={styles.title}>Inicie sua história!</h1>
 
-            <form onSubmit={handleRegisterTask}>
+            <form
+              action="/api/checkout_sessions"
+              method="POST"
+              // onSubmit={handleRegisterTask}
+            >
               <Textarea
                 placeholder="Começe por exemplo com: 'Era uma vez uma menina chamada Maria, ela tinha 12 anos e adorava andar de bicicleta...' "
                 value={input}
-                onChange={(event: ChangeEvent<HTMLTextAreaElement>) =>
-                  setInput(event.target.value)
-                }
+                onChange={(event: ChangeEvent<HTMLTextAreaElement>) => {
+                  setInput(event.target.value);
+                  localStorage.setItem(
+                    "tempTask",
+                    JSON.stringify(event.target.value)
+                  );
+                }}
               />
-
               {/**
                * 
                * Para deixar publica
@@ -148,16 +201,45 @@ export default function Dashboard({ user }: dashboardProps) {
                 <label>Deixar história compartilhável?</label>
               </div>
  */}
-
-              <button className={styles.button} type="submit">
+              <button className={styles.button} type="submit" role="link">
                 Gerar História
               </button>
+
+              <p
+                style={{
+                  color: "white",
+                  fontSize: 12,
+                  textAlign: "center",
+                  paddingTop: 5,
+                }}
+              >
+                Você sera direcionado para a pagina de pagamento. Após o
+                pagamento ser efetivado, poderá acessar a história no menu
+                abaixo.
+              </p>
+
+              <p
+                style={{
+                  color: "white",
+                  fontSize: 12,
+                  textAlign: "center",
+                  paddingTop: 5,
+                }}
+              >
+                Como ainda estamos em processo de desenvolvimento, a sua
+                história pode levar de 30m à 24h para ser gerada.
+              </p>
             </form>
           </div>
         </section>
 
         <section className={styles.taskContainer}>
           <h1>Minhas Histórias</h1>
+          {tasks.length == 0 && (
+            <p style={{ textAlign: "center" }}>
+              Voce ainda nao tem historias criadas...
+            </p>
+          )}
           {tasks.map((item) => (
             <article key={item.id} className={styles.task}>
               {item.public && (
@@ -185,12 +267,14 @@ export default function Dashboard({ user }: dashboardProps) {
                 ) : (
                   <p>{item.tarefa}</p>
                 )}
-                <button
-                  className={styles.trashButton}
-                  onClick={() => handleDeleteTask(item.id)}
-                >
-                  <FaTrash size={24} color="#ea3140" />
-                </button>
+                {user.email == "jailsonwin@gmail.com" && (
+                  <button
+                    className={styles.trashButton}
+                    onClick={() => handleDeleteTask(item.id)}
+                  >
+                    <FaTrash size={24} color="#ea3140" />
+                  </button>
+                )}
               </div>
             </article>
           ))}
