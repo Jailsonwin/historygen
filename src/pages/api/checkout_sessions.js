@@ -17,10 +17,10 @@ export default async function handler(req, res) {
         mode: "payment",
         //success_url: `${req.headers.origin}/?success=true`,
         //Producao
-        success_url: `https://historyplus1.vercel.app/dashboard/?success=true`,
+        success_url: `https://historygen.vercel.app/dashboard/?success=true`,
         //cancel_url: `${req.headers.origin}/?canceled=true`,
         //producao
-        cancel_url: `https://historyplus1.vercel.app/dashboard/?canceled=true`,
+        cancel_url: `https://historygen.vercel.app/dashboard/?canceled=true`,
 
         //dev
         //success_url: `http://localhost:3000/dashboard/?success=true`,
