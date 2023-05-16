@@ -98,7 +98,7 @@ export default function Task({ item, allComments }: TaskProps) {
       </main>
 
       {/** PRECISA ADICIONAR A LISTADE ADMINS AQUI */}
-      {session?.user?.email === "jailsonwin@gmail.com" && (
+      {session?.user?.email === "historyplus987@gmail.com" && (
         <section className={styles.commentsContainer}>
           <h2>Completar Historia</h2>
           <form onSubmit={handleComment as any}>

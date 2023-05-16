@@ -24,7 +24,6 @@ import Stripe from "stripe";
 
 import { loadStripe } from "react-stripe-js";
 import React from "react";
-import { Session } from "inspector";
 
 interface dashboardProps {
   user: {
@@ -69,7 +68,6 @@ export default function Dashboard({ user }: dashboardProps) {
     const query = new URLSearchParams(window.location.search);
     if (query.get("success")) {
       console.log("Order placed! You will receive an email confirmation.");
-
       finalizaCadastro();
     }
 
@@ -77,6 +75,7 @@ export default function Dashboard({ user }: dashboardProps) {
       console.log(
         "Order canceled -- continue to shop around and checkout when you’re ready."
       );
+
       alert("COMPRA CANCELADA");
     }
   }, []);
@@ -89,7 +88,7 @@ export default function Dashboard({ user }: dashboardProps) {
     async function loadTarefas() {
       const tarefasRef = collection(db, "tarefas");
       let q;
-      if (user?.email === "jailsonwin@gmail.com") {
+      if (user?.email === "historyplus987@gmail.com") {
         q = query(tarefasRef, orderBy("created", "desc"));
       } else {
         q = query(
@@ -136,6 +135,9 @@ export default function Dashboard({ user }: dashboardProps) {
       created: new Date(),
       user: user?.email,
     });
+
+    window.location.replace("http://localhost:3000/dashboard");
+    localStorage.removeItem("tempTask");
     setInput("");
 
     try {
@@ -245,7 +247,7 @@ export default function Dashboard({ user }: dashboardProps) {
               {item.public && (
                 <div className={styles.tagContainer}>
                   <label className={styles.tag}>
-                    <a href={`/task/${item.id}`}>História completa</a>{" "}
+                    <a href={`/task/${item.id}`}>Clique para acessar</a>{" "}
                   </label>
                   <button
                     className={styles.shareButton}
@@ -267,7 +269,7 @@ export default function Dashboard({ user }: dashboardProps) {
                 ) : (
                   <p>{item.tarefa}</p>
                 )}
-                {user.email == "jailsonwin@gmail.com" && (
+                {user.email == "historyplus987@gmail.com" && (
                   <button
                     className={styles.trashButton}
                     onClick={() => handleDeleteTask(item.id)}
