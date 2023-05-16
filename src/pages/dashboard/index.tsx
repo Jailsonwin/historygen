@@ -136,7 +136,7 @@ export default function Dashboard({ user }: dashboardProps) {
       user: user?.email,
     });
 
-    window.location.replace("http://localhost:3000/dashboard");
+    window.location.replace("https://historygen.vercel.app/dashboard");
     localStorage.removeItem("tempTask");
     setInput("");
 
